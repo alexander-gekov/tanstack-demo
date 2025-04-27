@@ -1,12 +1,9 @@
 <template>
-  <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">Prefetching Demo</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div v-for="todo in todos" :key="todo.id" class="border p-4 rounded-lg">
-        <NuxtLink
-          @mouseenter="prefetchTodo(todo.id)"
-          :to="`/todo/${todo.id}`"
-          class="text-blue-500 hover:underline">
+  <div>
+    <h1>Prefetching Demo</h1>
+    <div>
+      <div v-for="todo in todos" :key="todo.id">
+        <NuxtLink @mouseenter="prefetchTodo(todo.id)" :to="`/todo/${todo.id}`">
           Todo {{ todo.id }}
         </NuxtLink>
       </div>

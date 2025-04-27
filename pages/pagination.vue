@@ -1,42 +1,22 @@
 <template>
-  <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">Pagination Demo</h1>
+  <div>
+    <h1>Pagination Demo</h1>
 
-    <div class="max-w-4xl">
-      <div
-        v-if="!isLoading"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-        <div v-for="todo in todos?.data" :key="todo.id" class="flex gap-2">
+    <div>
+      <div v-if="!isLoading">
+        <div v-for="todo in todos?.data" :key="todo.id">
           # {{ todo.id }}
           <input type="checkbox" v-model="todo.completed" />
           {{ todo.title }}: {{ todo.completed ? "Completed" : "Not Completed" }}
         </div>
       </div>
 
-      <div v-if="isLoading" class="text-center py-4">Loading...</div>
+      <div v-if="isLoading">Loading...</div>
 
-      <div class="flex justify-center items-center space-x-2">
-        <button
-          @click="prevPage"
-          :disabled="page === 1"
-          class="px-4 py-2 border rounded"
-          :class="
-            page === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'
-          ">
-          Previous
-        </button>
-        <span class="text-gray-600">Page {{ page }} of {{ totalPages }}</span>
-        <button
-          @click="nextPage"
-          :disabled="page === totalPages"
-          class="px-4 py-2 border rounded"
-          :class="
-            page === totalPages
-              ? 'opacity-50 cursor-not-allowed'
-              : 'hover:bg-gray-100'
-          ">
-          Next
-        </button>
+      <div>
+        <button @click="prevPage" :disabled="page === 1">Previous</button>
+        <span>Page {{ page }} of {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="page === totalPages">Next</button>
       </div>
     </div>
   </div>

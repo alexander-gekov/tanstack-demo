@@ -1,23 +1,18 @@
 <template>
-  <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">Polling Demo</h1>
+  <div>
+    <h1>Polling Demo</h1>
 
-    <div class="max-w-md">
-      <div class="mb-4 flex items-center space-x-4">
-        <button
-          @click="togglePolling"
-          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          :class="{ 'bg-red-500 hover:bg-red-600': isPolling }">
+    <div>
+      <div>
+        <button @click="togglePolling">
           {{ isPolling ? "Stop Polling" : "Start Polling" }}
         </button>
       </div>
 
-      <div class="border rounded-lg p-4">
-        <h2 class="text-lg font-semibold mb-2">Current Bitcoin Price</h2>
-        <div v-if="isLoading" class="text-gray-600">Loading...</div>
-        <div v-else class="text-3xl font-bold">
-          ${{ price?.toLocaleString() }}
-        </div>
+      <div>
+        <h2>Current Bitcoin Price</h2>
+        <div v-if="isLoading">Loading...</div>
+        <div v-else>${{ price?.toLocaleString() }}</div>
       </div>
     </div>
   </div>
@@ -42,6 +37,8 @@ const { data: priceData, isLoading } = useQuery({
     ),
   refetchInterval: computed(() => (isPolling.value ? 5000 : false)),
   refetchIntervalInBackground: true,
+  retry: 3,
+  refetchOnWindowFocus: true,
 });
 
 const price = computed(() => priceData.value?.bitcoin.usd);

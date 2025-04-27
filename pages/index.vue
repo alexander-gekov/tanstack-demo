@@ -1,17 +1,11 @@
 <template>
-  <div class="p-8">
-    <h1 class="text-3xl font-bold mb-8">TanStack Query Demos</h1>
+  <div>
+    <h1>TanStack Query Demos</h1>
 
-    <button @click="clearCache">Clear and Garbage Collection</button>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <NuxtLink
-        v-for="demo in demos"
-        :key="demo.path"
-        :to="demo.path"
-        class="block p-6 border rounded-lg hover:border-blue-500 transition-colors">
-        <h2 class="text-xl font-semibold mb-2">{{ demo.title }}</h2>
-        <p class="text-gray-600">{{ demo.description }}</p>
+    <div>
+      <NuxtLink v-for="demo in demos" :key="demo.path" :to="demo.path">
+        <h2>{{ demo.title }}</h2>
+        <p>{{ demo.description }}</p>
       </NuxtLink>
     </div>
   </div>

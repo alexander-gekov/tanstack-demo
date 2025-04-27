@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div>
     <div>
       <input type="text" v-model="newTodo" />
       <button @click="handleCreateTodo">Create Todo</button>
@@ -7,7 +7,7 @@
     <div v-if="isLoading">Loading...</div>
     <div v-else-if="isError">Error: {{ error }}</div>
     <div v-else>
-      <div v-for="todo in todos" :key="todo.id" class="flex gap-2">
+      <div v-for="todo in todos" :key="todo.id">
         # {{ todo.id }}
         <input type="checkbox" v-model="todo.completed" />
         {{ todo.title }}: {{ todo.completed ? "Completed" : "Not Completed" }}

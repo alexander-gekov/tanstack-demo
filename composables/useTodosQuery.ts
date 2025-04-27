@@ -14,7 +14,8 @@ export const useTodosQuery = () => {
   const todosQuery = useQuery({
     queryKey: ["todos"],
     queryFn: fetchTodos,
-    staleTime: 1000 * 1,
+    staleTime: 0, // default is 0
+    gcTime: 500, // default is 5,
   });
 
   const createTodoMutation = useMutation({
@@ -25,6 +26,7 @@ export const useTodosQuery = () => {
         body: todoData,
       });
     },
+    mutationKey: ["createTodo"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todos"] });
     },

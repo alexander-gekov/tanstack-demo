@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col gap-4">
-    <h1 class="text-2xl font-bold mb-4">Optimistic Updates Demo</h1>
+  <div>
+    <h1>Optimistic Updates Demo</h1>
     <div>
       <input type="text" v-model="newTodo" />
       <button @click="handleCreateTodo">Create Todo</button>
@@ -23,7 +23,7 @@
         }}
         <button disabled>Delete</button>
       </div>
-      <div v-for="todo in todos" :key="todo.id" class="flex gap-2">
+      <div v-for="todo in todos" :key="todo.id">
         # {{ todo.id }}
         <input type="checkbox" v-model="todo.completed" />
         {{ todo.title }}: {{ todo.completed ? "Completed" : "Not Completed" }}

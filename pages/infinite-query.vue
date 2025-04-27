@@ -1,23 +1,20 @@
 <template>
-  <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">Infinite Query Demo</h1>
+  <div>
+    <h1>Infinite Query Demo</h1>
 
-    <div class="max-w-2xl">
-      <div class="space-y-4 h-screen overflow-y-auto" v-auto-animate>
+    <div>
+      <div v-auto-animate>
         <template v-if="data">
-          <div
-            v-for="(page, pageIndex) in data.pages"
-            :key="pageIndex"
-            class="h-screen">
+          <div v-for="(page, pageIndex) in data.pages" :key="pageIndex">
             <div
               v-for="todo in page.data"
               :key="todo.id"
-              class="border rounded-lg p-4 space-y-40 h-40"
               :ref="(el) => {
                 if (todo === page.data[page.data.length - 1]) {
                   lastTodoRef = el as HTMLElement;
                 }
-              }">
+              }"
+              style="padding-top: 40px; padding-bottom: 40px">
               # {{ todo.id }}
               <input type="checkbox" v-model="todo.completed" />
               {{ todo.title }}:
@@ -27,25 +24,18 @@
         </template>
       </div>
 
-      <div v-if="isFetchingNextPage" class="text-center py-4">
-        <div class="inline-flex items-center">
-          <div
-            class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+      <div v-if="isFetchingNextPage">
+        <div>
+          <div></div>
           Loading more...
         </div>
       </div>
 
-      <div v-if="hasNextPage && !isFetchingNextPage" class="text-center py-4">
-        <button
-          @click="() => fetchNextPage()"
-          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-          Load More
-        </button>
+      <div v-if="hasNextPage && !isFetchingNextPage">
+        <button @click="() => fetchNextPage()">Load More</button>
       </div>
 
-      <div
-        v-if="!hasNextPage && data?.pages?.length"
-        class="text-center py-4 text-gray-600">
+      <div v-if="!hasNextPage && data?.pages?.length">
         No more todos to load
       </div>
     </div>
