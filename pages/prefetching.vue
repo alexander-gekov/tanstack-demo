@@ -5,17 +5,18 @@
       <div v-for="todo in todos" :key="todo.id" class="border p-4 rounded-lg">
         <NuxtLink
           @mouseenter="prefetchTodo(todo.id)"
-          :to="`/post/${todo.id}`"
+          :to="`/todo/${todo.id}`"
           class="text-blue-500 hover:underline">
           Todo {{ todo.id }}
         </NuxtLink>
       </div>
-      {{ todos }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useQueryClient } from "@tanstack/vue-query";
+
 const queryClient = useQueryClient();
 
 const { todos } = useTodosQuery();

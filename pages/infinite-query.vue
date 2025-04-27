@@ -3,72 +3,78 @@
     <h1 class="text-2xl font-bold mb-4">Infinite Query Demo</h1>
 
     <div class="max-w-2xl">
-      <div class="space-y-4" v-auto-animate>
-        <div v-for="page in data?.pages ?? []" :key="page.nextId">
+      <div class="space-y-4 h-screen overflow-y-auto" v-auto-animate>
+        <template v-if="data">
           <div
-            v-for="comment in page.comments"
-            :key="comment.id"
-            class="border rounded-lg p-4">
-            <div class="flex items-start space-x-4">
-              <div class="flex-shrink-0">
-                <div
-                  class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                  {{ comment.email[0].toUpperCase() }}
-                </div>
-              </div>
-              <div>
-                <div class="font-medium">{{ comment.email }}</div>
-                <p class="text-gray-600 mt-1">{{ comment.body }}</p>
-              </div>
+            v-for="(page, pageIndex) in data.pages"
+            :key="pageIndex"
+            class="h-screen">
+            <div
+              v-for="todo in page.data"
+              :key="todo.id"
+              class="border rounded-lg p-4 space-y-40 h-40"
+              :ref="(el) => {
+                if (todo === page.data[page.data.length - 1]) {
+                  lastTodoRef = el as HTMLElement;
+                }
+              }">
+              # {{ todo.id }}
+              <input type="checkbox" v-model="todo.completed" />
+              {{ todo.title }}:
+              {{ todo.completed ? "Completed" : "Not Completed" }}
             </div>
           </div>
-        </div>
+        </template>
       </div>
 
       <div v-if="isFetchingNextPage" class="text-center py-4">
-        Loading more...
+        <div class="inline-flex items-center">
+          <div
+            class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+          Loading more...
+        </div>
       </div>
 
       <div v-if="hasNextPage && !isFetchingNextPage" class="text-center py-4">
         <button
-          @click="fetchNextPage"
-          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          @click="() => fetchNextPage()"
+          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
           Load More
         </button>
       </div>
 
-      <div v-if="!hasNextPage" class="text-center py-4 text-gray-600">
-        No more comments to load
+      <div
+        v-if="!hasNextPage && data?.pages?.length"
+        class="text-center py-4 text-gray-600">
+        No more todos to load
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-interface Comment {
-  id: number;
-  email: string;
-  body: string;
-}
+import { useInfiniteQuery } from "@tanstack/vue-query";
+import type { TodoPaginationResponse } from "~/types";
 
-interface CommentsResponse {
-  comments: Comment[];
-  nextId: number | null;
-}
+const lastTodoRef = ref<HTMLElement>();
 
-const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-  useInfiniteQuery({
-    queryKey: ["comments"],
-    queryFn: ({ pageParam = 0 }) =>
-      $fetch<CommentsResponse>(
-        `https://api.example.com/comments?cursor=${pageParam}`
-      ),
-    getNextPageParam: (lastPage) => lastPage.nextId,
+const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+  useInfiniteQuery<TodoPaginationResponse>({
+    queryKey: ["todos"],
+    queryFn: async ({ pageParam }) => {
+      return await $fetch<TodoPaginationResponse>("/api/todos", {
+        query: {
+          page: pageParam,
+        },
+      });
+    },
+    getNextPageParam: (lastPage) => lastPage.next ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.prev ?? undefined,
+    initialPageParam: 1,
   });
 
-// Optional: Implement intersection observer for auto-loading
+// Implement intersection observer for auto-loading
 const observer = ref<IntersectionObserver>();
-const lastCommentRef = ref<HTMLElement>();
 
 onMounted(() => {
   observer.value = new IntersectionObserver(
@@ -81,17 +87,22 @@ onMounted(() => {
         fetchNextPage();
       }
     },
-    { threshold: 0.5 }
+    { threshold: 0.8 }
   );
+
+  if (lastTodoRef.value) {
+    observer.value.observe(lastTodoRef.value);
+  }
 });
 
 onUnmounted(() => {
   observer.value?.disconnect();
 });
 
-watch(lastCommentRef, (el) => {
-  if (el) {
-    observer.value?.observe(el);
-  }
+watch(lastTodoRef, (el) => {
+  if (!el || !observer.value) return;
+
+  observer.value.disconnect();
+  observer.value.observe(el);
 });
 </script>

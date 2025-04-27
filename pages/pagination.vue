@@ -3,12 +3,13 @@
     <h1 class="text-2xl font-bold mb-4">Pagination Demo</h1>
 
     <div class="max-w-4xl">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-        <div v-for="post in posts" :key="post.id" class="border rounded-lg p-4">
-          <h2 class="text-lg font-semibold mb-2 line-clamp-1">
-            {{ post.title }}
-          </h2>
-          <p class="text-gray-600 line-clamp-3">{{ post.body }}</p>
+      <div
+        v-if="!isLoading"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <div v-for="todo in todos?.data" :key="todo.id" class="flex gap-2">
+          # {{ todo.id }}
+          <input type="checkbox" v-model="todo.completed" />
+          {{ todo.title }}: {{ todo.completed ? "Completed" : "Not Completed" }}
         </div>
       </div>
 
@@ -42,33 +43,22 @@
 </template>
 
 <script setup lang="ts">
-interface Post {
-  id: number;
-  title: string;
-  body: string;
-}
-
-interface PostResponse {
-  data: Post[];
-  total: number;
-  per_page: number;
-}
+import { useQuery } from "@tanstack/vue-query";
+import type { Todo, TodoPaginationResponse } from "~/types";
 
 const page = ref(1);
-const perPage = 9;
 
-const { data, isLoading } = useQuery({
-  queryKey: ["posts", page],
+const { data: todos, isLoading } = useQuery({
+  queryKey: ["todos", page],
   queryFn: () =>
-    $fetch<PostResponse>(
-      `https://api.example.com/posts?page=${page.value}&per_page=${perPage}`
-    ),
+    $fetch<TodoPaginationResponse>(`/api/todos`, {
+      query: {
+        page: page.value,
+      },
+    }),
 });
 
-const posts = computed(() => data.value?.data ?? []);
-const totalPages = computed(() =>
-  Math.ceil((data.value?.total ?? 0) / perPage)
-);
+const totalPages = computed(() => todos.value?.pages ?? 1);
 
 const prevPage = () => {
   if (page.value > 1) {

@@ -1,13 +1,22 @@
-import { Todo } from "~/types";
+import { Todo, TodoPaginationResponse } from "~/types";
 
 export default defineEventHandler(async (event) => {
   const method = event.method;
 
   if (method === "GET") {
-    const todos = await $fetch<Todo[]>(
-      "http://localhost:3000/todos?_sort=-createdAt,-userId,-id"
-    );
-    return todos;
+    const query = getQuery(event);
+    const page = query.page ?? undefined;
+    if (page) {
+      const todosResponse = await $fetch<TodoPaginationResponse>(
+        `http://localhost:3000/todos?_page=${page}_sort=-createdAt,-userId,-id&`
+      );
+      return todosResponse;
+    } else {
+      const todos = await $fetch<Todo[]>(
+        `http://localhost:3000/todos?_sort=-createdAt,-userId,-id&`
+      );
+      return todos;
+    }
   }
 
   if (method === "POST") {
@@ -25,7 +34,6 @@ export default defineEventHandler(async (event) => {
 
   if (method === "DELETE") {
     const body = await readBody(event);
-    console.log(body);
     const deletedTodo = await $fetch<Todo>(
       `http://localhost:3000/todos/${body.id}`,
       {

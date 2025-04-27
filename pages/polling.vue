@@ -10,9 +10,6 @@
           :class="{ 'bg-red-500 hover:bg-red-600': isPolling }">
           {{ isPolling ? "Stop Polling" : "Start Polling" }}
         </button>
-        <span class="text-sm text-gray-600">
-          Last updated: {{ lastUpdated }}
-        </span>
       </div>
 
       <div class="border rounded-lg p-4">
@@ -27,6 +24,8 @@
 </template>
 
 <script setup lang="ts">
+import { useQuery } from "@tanstack/vue-query";
+
 interface PriceData {
   bitcoin: {
     usd: number;
@@ -34,7 +33,6 @@ interface PriceData {
 }
 
 const isPolling = ref(false);
-const lastUpdated = ref(new Date().toLocaleTimeString());
 
 const { data: priceData, isLoading } = useQuery({
   queryKey: ["bitcoin-price"],
@@ -43,13 +41,10 @@ const { data: priceData, isLoading } = useQuery({
       "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
     ),
   refetchInterval: computed(() => (isPolling.value ? 5000 : false)),
+  refetchIntervalInBackground: true,
 });
 
 const price = computed(() => priceData.value?.bitcoin.usd);
-
-watch(priceData, () => {
-  lastUpdated.value = new Date().toLocaleTimeString();
-});
 
 const togglePolling = () => {
   isPolling.value = !isPolling.value;
